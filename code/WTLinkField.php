@@ -373,7 +373,15 @@ class WTLink extends DBField implements CompositeDBField {
                 $link = '';
                 switch($this->type) {
                         case 'Internal' :
-                                if ($this->internal) $link = SiteTree::get()->byID($this->internal)->Link();
+                                if ($this->internal) {
+                                    $page = SiteTree::get()->byID($this->internal);
+                                    // guard against the page not existing. This can legitimately happen, for example
+                                    // where a link is saved on an object that is not versioned. If the page linked to
+                                    // exists in draft it may appear correctly, but blow up on live.
+                                    if ($page) {
+                                        $link = $page->Link();
+                                    }
+                                }
                                 break;
                         case 'External' :
                                 $link = $this->external;
